@@ -212,6 +212,26 @@ function checkBotConnection() {
 }
 setInterval(checkBotConnection, 1000);
 
+let currentChatState = isChatOpen();
+function checkChatOpen(){
+    const now = new Date(); // Get the current date and time
+    const localIsoString = new Date(now - now.getTimezoneOffset() * 60000).toISOString();
+    if ( currentChatState !== isChatOpen() ){
+        currentChatState = isChatOpen();
+
+        console.log(`Chat state has changed, now ${currentChatState ? 'OPEN.' : 'CLOSED.'} Local time ${localIsoString}`)
+
+        if ( botPolling == 0 ) {
+            const formattedMessage = `Chat state has changed, now ${currentChatState ? 'OPEN.' : 'CLOSED.'} Local time ${localIsoString}`;
+            bot.sendMessage(telegramChannelID, formattedMessage, { parse_mode: 'Markdown' }).then(() => {
+                console.log('Message sent successfully to Telegram');
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }
+};
+setInterval(checkChatOpen, 1000);
 
 bot.on('polling_error', (error) => {
     if ( error.response.statusCode == 409 ){
@@ -242,11 +262,25 @@ function isChatOpen(){
     const [yearStart, monthStart, dayStart] = helpdeskConfig.startDate.split('-');
     const [yearEnd, monthEnd, dayEnd] = helpdeskConfig.endDate.split('-');
     let openDate = new Date(yearStart, monthStart - 1, dayStart)
-    let closedDate = new Date(yearEnd, monthEnd - 1, dayEnd)
-    closedDate.setHours(23, 59, 59, 999);
+    let closeDate = new Date(yearEnd, monthEnd - 1, dayEnd)
+    closeDate.setHours(23, 59, 59, 999);
 
-    if ( currentDate < openDate || currentDate > closedDate ) { chatOpen = false; }
-    if (currentHour < parseInt(helpdeskConfig.startTime, 10) || currentHour > parseInt(helpdeskConfig.endTime, 10) ) { chatOpen = false; }
+    let openHour = parseInt(helpdeskConfig.startTime, 10);
+    let closeHour = parseInt(helpdeskConfig.endTime, 10)
+
+    enableTimeDebug = true;
+
+    if ( enableTimeDebug ){
+        console.log("\nCurrent values:")
+        console.log("openDate", openDate, "closeDate", closeDate, "currentDate", currentDate)
+        console.log("openHour", openHour, "closeHour", closeHour, "currentHour", currentHour)
+        console.log("\nTruthy statements:")
+        console.log("Before start date:", currentDate < openDate, "After end date:", currentDate > closeDate)
+        console.log("Before start time:", currentHour < openHour, "After end time:", currentHour >= closeHour)
+    }
+
+    if ( currentDate < openDate || currentDate > closeDate ) { chatOpen = false; }
+    if ( currentHour < openHour || currentHour >= closeHour ) { chatOpen = false; }
 
     return chatOpen
 }
