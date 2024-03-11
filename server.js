@@ -268,7 +268,7 @@ function isChatOpen(){
     let openHour = parseInt(helpdeskConfig.startTime, 10);
     let closeHour = parseInt(helpdeskConfig.endTime, 10)
 
-    enableTimeDebug = true;
+    enableTimeDebug = false;
 
     if ( enableTimeDebug ){
         console.log("\nCurrent values:")
