@@ -1,0 +1,21 @@
+{
+  "telegram": {
+    "botToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "channelID": "XXXXXXXXXXX"
+  },
+  "helpdesk": {
+    "startTime": "HH",
+    "endTime": "HH",
+    "startDate": "YYYY-MM-DD",
+    "endDate": "YYYY-MM-DD",
+    "roomList": ["room1", "room2", "room3"]
+  },
+  "certs": {
+    "fullChain": "/full/path/to/fullchain.pem",
+    "privkey": "/full/path/to/privkey.pem"
+  },
+  "wifi": {
+    "ssid": "EXAMPLE-SSID",
+    "password": "EXAMPLE-PASSWORD"
+  }
+}
