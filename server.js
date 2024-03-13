@@ -10,8 +10,8 @@ const fullChain = config.get('certs.fullChain');
 const privkey = config.get('certs.privkey');
 
 const options = {
-    cert: fs.readFileSync(fullChain),
-    key: fs.readFileSync(privkey)
+    cert: readFileSyncSafe(fullChain),
+    key: readFileSyncSafe(privkey)
 };
 
 const server = https.createServer(options, app);
@@ -28,6 +28,7 @@ const telegramBotToken = config.get('telegram.botToken');
 const telegramChannelID = config.get('telegram.channelID');
 const helpdeskConfig = config.get('helpdesk');
 const bot = new TelegramBot(telegramBotToken, { polling: true });
+let botPolling = 0;
 
 let rooms = []
 let idNameDic = []
@@ -170,6 +171,28 @@ io.on('connection', async (socket) => {
     })
 });
 
+// Function to check if the bot is still responsive
+function checkBotConnection() {
+    bot.getMe().then(me => {
+        botPolling = 0;
+    }).catch(error => {
+        console.error('Error checking bot connection:', error.message);
+    });
+}
+setInterval(checkBotConnection, 1000);
+
+
+bot.on('polling_error', (error) => {
+    if ( error.response.statusCode == 409 ){
+        console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Retry count ${botPolling}: Another instance of your Telegram bot is already running. Only once instance per token is allowed.`));
+    } else if ( error.response.statusCode == 404 ) {
+        console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Retry count ${botPolling}: Could not connect to Telegram bot, please double check your config/production.json file`));
+    }
+    botPolling += 1;
+
+    if ( botPolling > 10 ) { process.exit(1) }
+});
+
 function getCurrentRoom(UUIDs) {
     for (const room of rooms) {
         if (room.UUIDs.includes(UUIDs)) {
@@ -189,4 +212,25 @@ function isChatOpen(){
     if (currentHour < helpdeskConfig.startTime || currentHour > helpdeskConfig.endTime ) { chatOpen = false; }
 
     return chatOpen
+}
+
+function readFileSyncSafe(filePath) {
+    try {
+        return fs.readFileSync(filePath);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+        console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/production.json file to include a valid certificate path, currently set to:`), filePath);
+        } else {
+        console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/production.json file to include a valid certificate, currently set to:`), filePath);
+        }
+        process.exit(1); // Exit the process or handle the error according to your application's logic
+    }
+}
+  
+function turnTextRed(text) {
+return `\x1b[31m${text}\x1b[0m`;
+}
+  
+function turnBackgroundRed(text) {
+return `\x1b[41m\x1b[37m${text}\x1b[0m`;
 }

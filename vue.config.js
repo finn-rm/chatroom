@@ -28,14 +28,13 @@ function readFileSyncSafe(filePath) {
     return fs.readFileSync(filePath);
   } catch (error) {
     if (error.code === 'ENOENT') {
-      console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/default.json file to include a valid certificate path, currently set to:`), filePath);
+      console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/production.json file to include a valid certificate path, currently set to:`), filePath);
     } else {
-      console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/default.json file to include a valid certificate, currently set to:`), filePath);
+      console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/production.json file to include a valid certificate, currently set to:`), filePath);
     }
     process.exit(1); // Exit the process or handle the error according to your application's logic
   }
 }
-
 
 function turnTextRed(text) {
   return `\x1b[31m${text}\x1b[0m`;
