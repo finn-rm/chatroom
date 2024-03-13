@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "body-parser": "^1.20.2",
     "concurrently": "^8.2.1",
     "config": "^3.3.9",
     "core-js": "^3.8.3",
@@ -28,7 +29,8 @@
     "vue-qrcode-component": "^2.1.1",
     "vue-router": "^4.0.3",
     "vuetify": "^3.0.0-beta.0",
-    "webfontloader": "^1.0.0"
+    "webfontloader": "^1.0.0",
+    "wifi-qr-code-generator": "^1.1.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

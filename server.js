@@ -5,6 +5,8 @@ const app = express();
 const fs = require('fs');
 const https = require('https');
 const config = require('config');
+const qrcode = require('wifi-qr-code-generator')
+const bodyParser = require('body-parser');
 
 const fullChain = config.get('certs.fullChain');
 const privkey = config.get('certs.privkey');
@@ -34,6 +36,20 @@ let rooms = []
 let idNameDic = []
 
 app.use(cors());
+app.use(bodyParser.json());
+
+const validTimeFormat = /^(0\d|1\d|2[0-4]|00|24)$/;
+const validDateFormat = /^\d{4}-(0[1-9]|1[0-2])-(0\d|1\d|2\d|3[01])$/;
+
+if ( !validTimeFormat.test(helpdeskConfig.startTime) || !validTimeFormat.test(helpdeskConfig.endTime) ) { 
+    console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/production.json file with a starting and ending time in the format of "HH"`));
+    process.exit(1); // Exit the process or handle the error according to your application's logic
+}
+
+if ( !validDateFormat.test(helpdeskConfig.startDate) || !validDateFormat.test(helpdeskConfig.endDate) ) { 
+    console.error(turnBackgroundRed(' ERROR '), turnTextRed(`Please update your config/production.json file with a starting and ending date in the format of "YYYY-MM-DD"`));
+    process.exit(1); // Exit the process or handle the error according to your application's logic
+}
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -42,6 +58,21 @@ app.get('/', (req, res) => {
 app.get('/config', (req, res) => {
     let chatOpen = isChatOpen();
     res.send({"roomList": helpdeskConfig.roomList, "chatOpen": chatOpen});
+});
+
+app.post('/qrcode', (req, res) => {
+
+    const option = req.body;
+
+    const pr = qrcode.generateWifiQRCode({
+        ssid: option.ssid,
+        password: option.password,
+        encryption: 'WPA',
+        hiddenSSID: false,
+        outputFormat: { type: 'svg' }
+    })
+
+    pr.then((data) => res.send({"qrCode": data}));
 });
 
 server.listen(port, () => {
@@ -208,8 +239,14 @@ function isChatOpen(){
     currentHour = currentDate.getHours()
     let chatOpen = true;
 
-    if (currentDate < helpdeskConfig.startDate || currentDate > helpdeskConfig.endDate ) { chatOpen = false; }
-    if (currentHour < helpdeskConfig.startTime || currentHour > helpdeskConfig.endTime ) { chatOpen = false; }
+    const [yearStart, monthStart, dayStart] = helpdeskConfig.startDate.split('-');
+    const [yearEnd, monthEnd, dayEnd] = helpdeskConfig.endDate.split('-');
+    let openDate = new Date(yearStart, monthStart - 1, dayStart)
+    let closedDate = new Date(yearEnd, monthEnd - 1, dayEnd)
+    closedDate.setHours(23, 59, 59, 999);
+
+    if ( currentDate < openDate || currentDate > closedDate ) { chatOpen = false; }
+    if (currentHour < parseInt(helpdeskConfig.startTime, 10) || currentHour > parseInt(helpdeskConfig.endTime, 10) ) { chatOpen = false; }
 
     return chatOpen
 }

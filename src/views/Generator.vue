@@ -8,6 +8,8 @@
                 <v-textarea v-model="rooms" label="Type a list of room names separated with commas"></v-textarea>
                 <div height="100px" class="mt-0" dense label="Onthoud mij"></div>
                 <v-checkbox v-model="wifi" label="Generate WiFi QR code?"></v-checkbox>
+                <v-text-field v-model="ssid" v-if="wifi" label="SSID"></v-text-field>
+                <v-text-field v-model="password" v-if="wifi" label="Password"></v-text-field>
                 </v-form>
               <v-btn height="50px" tile ripple depressed block color="secondary" @click="generateQRcode">Generate</v-btn>
               <div class="pt-3">
@@ -29,8 +31,8 @@
         <div v-if="wifi">
           <div class="font-weight-bold text-h2 text-red text-bold" align="center">Need WiFi?</div>
           <div class="text-h4 pt-10 pb-10" align="center">Scan the QR code below to get connected!</div>
-          <v-img style="max-height: 500px" src="/wifi-qr.png"></v-img>
-          <div class="text-h5 pt-15 text-blue-grey-lighten-3" align="center">SSID: {{ ssid }} | {{ password }}</div>
+          <div v-html="qrCodeData"></div>
+          <div class="text-h5 pt-15 text-blue-grey-lighten-3" align="center">SSID: {{ ssid }} | PW: {{ password }}</div>
           <p :style="{ 'page-break-before': isNotLastRoom(index, 'wifi') ? 'always' : 'auto' }"></p>
         </div>
       </v-container>
@@ -45,30 +47,66 @@ import QrcodeVue from 'vue-qrcode-component';
 
 export default {
     setup() {
-        const ssid = ref('EXAMPLE-SSID');
-        const password = ref('EXAMPLE-PASSWORD');
-
         const showQRCode = ref(false);
         const rooms = ref('');
         const wifi = ref('');
 
-        function generateQRcode() {
-            showQRCode.value = true;
-            roomList.value = rooms.value.split(',').map(item => item.trim().replace(/ /g, '-'));
-            function scroll() {
-              console.log(!(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight));
-              if (!(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight)) {
-                window.scrollTo(0, window.scrollY + 300);
-                setTimeout(scroll, 10);
-              } else {
-                delay(500).then(()=> window.print())
-              }
+        const ssid = ref('');
+        const password = ref('');
+        const qrCodeData = ref('');
+
+        async function generateQRcode() {
+
+          if ( !rooms.value ) { window.alert('Enter some room names.'); return; }
+          if ( (!ssid.value || !password.value) && wifi.value ) { window.alert('Enter a SSID and password.'); return; }
+          
+          if ( wifi.value ) {
+            await fetchQRCodeImage();
+          }
+
+          showQRCode.value = true;
+          roomList.value = rooms.value.split(',').map(item => item.trim().replace(/ /g, '-'));
+          function scroll() {
+            console.log(!(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight));
+            if (!(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight)) {
+              window.scrollTo(0, window.scrollY + 300);
+              setTimeout(scroll, 10);
+            } else {
+              delay(500).then(()=> window.print())
             }
-            delay(500).then(() => scroll());
+          }
+          delay(500).then(() => scroll());
         }
 
         function generateQRCodeUrl(roomName) {
             return `${window.location.origin}/${roomName}`;
+        }
+
+        async function fetchQRCodeImage() {
+          try {
+              const data = { ssid: ssid.value, password: password.value };
+              const response = await fetch(`${window.location.protocol}//${window.location.hostname}:3005/qrcode`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+              });
+
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+
+              const res = await response.json();
+              
+              qrCodeData.value = res.qrCode;
+
+              console.log(qrCodeData.value);
+
+          } catch (error) {
+              // Handle errors during the fetch
+              console.error('There was a problem with the fetch operation:', error);
+          }
         }
 
         const roomList = ref([]);
@@ -80,7 +118,8 @@ export default {
             generateQRCodeUrl,
             roomList,
             ssid,
-            password
+            password,
+            qrCodeData
         };
     },
     components: {
