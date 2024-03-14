@@ -148,8 +148,9 @@ server {
 }
 ```
 
-   *Make sure to edit the domain name placeholders ^*
-   *PS:* To quick replace all instances of **`YOUR_DOMAIN`**, run these command:
+*Make sure to edit the domain name placeholders ^*
+
+*PS:* To quick replace all instances of **`YOUR_DOMAIN`**, run these command:
 
 ```*
 DN="REPLACE_ME"
