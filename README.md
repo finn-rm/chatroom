@@ -92,28 +92,30 @@ If you need more information, here is a detailed breakdown on [certbot&#39;s sta
    * **`roomList`** 	- This is a list of room names that are allowed to be entered.
    * **`msgExpireTime`**	- This is the amount of seconds it will take for the message/room history to be wiped.
    * **`fullchain & privkey`** 	- This is the file path for the full chain certificate for your domain and the file path for the private key for the certificate.
-2. Build the Vue3 project into a static bundle by running:
+
+### NGINX installation for Vue frontend
+
+
+1. Build the Vue3 project into a static bundle by running:
 
 ```
 npm run prodclient
 ```
 
-3. Create the folder to serve the static content by running:
+2. Create the folder to serve the static content by running:
 
 ```
 sudo mkdir /www
 sudo cp -R chatroom/dist/* /www/
 ```
 
-### NGINX installation for Vue frontend
-
-1. Remove the default nginx demo site with:
+3. Remove the default nginx demo site with:
 
 ```
 sudo rm /etc/nginx/sites-enabled/default
 ```
 
-2. Create a virtual host by creating this example file:
+4. Create a virtual host by creating this example file:
 
 ```
 # /etc/nginx/sites-enabled/YOUR_DOMAIN
@@ -154,13 +156,13 @@ server {
    sudo sed -i "s/YOUR_DOMAIN/$DN/g" /etc/nginx/sites-enabled/$DN
 ```
 
-3. Start NGINX and enable on reboot by running:
+5. Start NGINX and enable on reboot by running:
 
 ```
 sudo systemctl enable nginx --now
 ```
 
-4. Navigate to your domain and check that the `ZZZ` page is being served with the correct certificates. To access the rest of the site we will need to start the node.js backend.
+6. Navigate to your domain and check that the `ZZZ` page is being served with the correct certificates. To access the rest of the site we will need to start the node.js backend.
 
 ### Systemd service for Node.js backend
 
