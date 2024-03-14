@@ -81,9 +81,7 @@ If you need more information, here is a detailed breakdown on [certbot&#39;s sta
 
 ### Configure setup files
 
-If you are looking to make a more permanent install that will be persistent over reboots, has slightly better performance, and supports SSL then follow this section.
-
-1. Fill out the `config/production.json` file with the values previously discovered from the setup stage.
+1. Fill out the `config/production.json` file with the values previously discovered from the [setup](#setup-telegram-bot) and [certificate](#create-certificates) stage.
 
    * **`botToken`**	- This is the Telegram bot token found during the [Telegram Bot Setup](#setup-telegram-bot) section.
    * **`channelID`** 	- This is the ID of the telegram channel you want the messages to be posted to. This was found during the [Telegram Bot Setup](#setup-telegram-bot) section.
@@ -94,59 +92,83 @@ If you are looking to make a more permanent install that will be persistent over
    * **`roomList`** 	- This is a list of room names that are allowed to be entered.
    * **`msgExpireTime`**	- This is the amount of seconds it will take for the message/room history to be wiped.
    * **`fullchain & privkey`** 	- This is the file path for the full chain certificate for your domain and the file path for the private key for the certificate.
-2. Run `npm run prodclient` to build the Vue3 project. When completed your bundle files will be stored in `chatroom/dist/`*
-3. Create the folder where the content will be served from with `sudo mkdir /www`
-4. Copy your build into the `www` folder by running `sudo cp -R /root/chatroom/dist/* /www/`
+2. Build the Vue3 project into a static bundle by running:
+
+```
+npm run prodclient
+```
+
+3. Create the folder to serve the static content by running:
+
+```
+sudo mkdir /www
+sudo cp -R chatroom/dist/* /www/
+```
 
 ### NGINX installation for Vue frontend
 
-1. Install NGINX with `sudo apt install nginx`
-2. Remove the default nginx demo site with `sudo rm /etc/nginx/sites-enabled/default`
-3. Create a virtual host by editing `/etc/nginx/sites-enabled/YOUR_DOMAIN` with the config below. **Make sure to replace the placeholder values.**
+1. Remove the default nginx demo site with:
 
-   ```
-   server {
-       add_header cache-control no-cache always;
-       add_header Last-Modified  "" always;
-       etag off;
-       if_modified_since off;
-       server_name YOUR_DOMAIN;
+```
+sudo rm /etc/nginx/sites-enabled/default
+```
 
-       location / {
-           root /www;
-           index index.html;
-           try_files $uri $uri/ /index.html;
-       }
+2. Create a virtual host by creating this example file:
 
-       listen 443 ssl;
-       ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
-       ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
-   }
-   server {
-       if ($host = YOUR_DOMAIN) {
-           return 301 https://$host$request_uri;
-       }
+```
+# /etc/nginx/sites-enabled/YOUR_DOMAIN
 
-       listen 80;
-       server_name YOUR_DOMAIN;
-       return 404;
-   }
-   ```
+server {
+    add_header cache-control no-cache always;
+    add_header Last-Modified  "" always;
+    etag off;
+    if_modified_since off;
+    server_name YOUR_DOMAIN;
 
-   PS: To quick replace all instances of **`YOUR_DOMAIN`**, run these command:
+    location / {
+        root /www;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
 
-   ```*
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+}
+server {
+    if ($host = YOUR_DOMAIN) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name YOUR_DOMAIN;
+    return 404;
+}
+```
+
+   *Make sure to edit the domain name placeholders ^
+   PS:* To quick replace all instances of **`YOUR_DOMAIN`**, run these command:
+
+```*
    DN="REPLACE_ME"
    sudo sed -i "s/YOUR_DOMAIN/$DN/g" /etc/nginx/sites-enabled/$DN
-   ```
-4. Start NGINX and enable on reboot by running `sudo systemctl enable nginx --now`
-5. Navigate to your domain and check that the ZZZ page is being served with the correct certificates.
+```
+
+3. Start NGINX and enable on reboot by running:
+
+```
+sudo systemctl enable nginx --now
+```
+
+4. Navigate to your domain and check that the `ZZZ` page is being served with the correct certificates. To access the rest of the site we will need to start the node.js backend.
 
 ### Systemd service for Node.js backend
 
-We can now setup the Node.js backend as a service, below is an example file you can put in `/etc/systemd/system/chatroom.service` **Make sure to replace the placeholder values.**
+We can now setup the Node.js backend as a service by creating this example file:
 
 ```
+# /etc/systemd/system/chatroom.service
+
 [Unit]
 Description=Chatroom Node.js Server
 After=network.target
@@ -161,6 +183,8 @@ WorkingDirectory=/full/path/to/chatroom
 [Install]
 WantedBy=multi-user.target
 ```
+
+*Make sure to edit the paths and user placeholders ^*
 
 Next, run these commands to enable your service to run on startup and also start the service:
 
