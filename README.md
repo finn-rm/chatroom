@@ -148,12 +148,12 @@ server {
 }
 ```
 
-   *Make sure to edit the domain name placeholders ^
-   PS:* To quick replace all instances of **`YOUR_DOMAIN`**, run these command:
+   *Make sure to edit the domain name placeholders ^*
+   *PS:* To quick replace all instances of **`YOUR_DOMAIN`**, run these command:
 
 ```*
-   DN="REPLACE_ME"
-   sudo sed -i "s/YOUR_DOMAIN/$DN/g" /etc/nginx/sites-enabled/$DN
+DN="REPLACE_ME"
+sudo sed -i "s/YOUR_DOMAIN/$DN/g" /etc/nginx/sites-enabled/$DN
 ```
 
 5. Start NGINX and enable on reboot by running:
