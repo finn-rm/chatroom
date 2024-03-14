@@ -8,7 +8,8 @@
     "endTime": "HH",
     "startDate": "YYYY-MM-DD",
     "endDate": "YYYY-MM-DD",
-    "roomList": ["room1", "room2", "room3"]
+    "roomList": ["room1", "room2", "room3"],
+    "msgExpireTime": "600"
   },
   "certs": {
     "fullChain": "/full/path/to/fullchain.pem",

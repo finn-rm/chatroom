@@ -11,6 +11,8 @@ const bodyParser = require('body-parser');
 const fullChain = config.get('certs.fullChain');
 const privkey = config.get('certs.privkey');
 
+const msgExpireTime = parseInt(config.get('helpdesk.msgExpireTime'), 10);
+
 const options = {
     cert: readFileSyncSafe(fullChain),
     key: readFileSyncSafe(privkey)
@@ -88,7 +90,7 @@ io.on('connection', async (socket) => {
     // Check for old messages
     rooms.forEach(room => {
         const currentTime = Date.now();
-        const timeLimit = 600 * 1000; // 60 seconds in milliseconds
+        const timeLimit = msgExpireTime * 1000; // 60 seconds in milliseconds
 
         room.messageLog = room.messageLog.filter(msg => (currentTime - msg.timestamp) <= timeLimit);
         
