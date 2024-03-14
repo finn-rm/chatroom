@@ -81,17 +81,17 @@ If you need more information, here is a detailed breakdown on [certbot&#39;s sta
 
 ### Configure setup files
 
-1. Fill out the `config/production.json` file with the values previously discovered from the [setup](#setup-telegram-bot) and [certificate](#create-certificates) stage.
+Fill out the `config/production.json` file with the values previously discovered from the [setup](#setup-telegram-bot) and [certificate](#create-certificates) stage.
 
-   * **`botToken`**	- This is the Telegram bot token found during the [Telegram Bot Setup](#setup-telegram-bot) section.
-   * **`channelID`** 	- This is the ID of the telegram channel you want the messages to be posted to. This was found during the [Telegram Bot Setup](#setup-telegram-bot) section.
-   * **`startTime`** 	- This is the hour in which the chat will be open to send messages to. If you set it to 09, the chat will open at 9AM on the dot.
-   * **`endTime`** 	- This is the hour that the chat will close and no messages will be able to be sent. If you set it to 20, the chat will close at 8PM on the dot.
-   * **`startDate`** 	- This is the date the chat will begin to be open from. It is inclusive, meaning that if you set this to 2023-02-25, the first time the chat will open will be on the 25th at the set `startTime`.
-   * **`endDate`** 	- This is the date the chat will end on. It is inclusive, meaning that if you set this to 2023-02-27, the last time the chat will close will be the 27th at the set `endTime`.
-   * **`roomList`** 	- This is a list of room names that are allowed to be entered.
-   * **`msgExpireTime`**	- This is the amount of seconds it will take for the message/room history to be wiped.
-   * **`fullchain & privkey`** 	- This is the file path for the full chain certificate for your domain and the file path for the private key for the certificate.
+* **`botToken`**	- This is the Telegram bot token found during the [Telegram Bot Setup](#setup-telegram-bot) section.
+* **`channelID`** 	- This is the ID of the telegram channel you want the messages to be posted to. This was found during the [Telegram Bot Setup](#setup-telegram-bot) section.
+* **`startTime`** 	- This is the hour in which the chat will be open to send messages to. If you set it to 09, the chat will open at 9AM on the dot.
+* **`endTime`** 	- This is the hour that the chat will close and no messages will be able to be sent. If you set it to 20, the chat will close at 8PM on the dot.
+* **`startDate`** 	- This is the date the chat will begin to be open from. It is inclusive, meaning that if you set this to 2023-02-25, the first time the chat will open will be on the 25th at the set `startTime`.
+* **`endDate`** 	- This is the date the chat will end on. It is inclusive, meaning that if you set this to 2023-02-27, the last time the chat will close will be the 27th at the set `endTime`.
+* **`roomList`** 	- This is a list of room names that are allowed to be entered.
+* **`msgExpireTime`**	- This is the amount of seconds it will take for the message/room history to be wiped.
+* **`fullchain & privkey`** 	- This is the file path for the full chain certificate for your domain and the file path for the private key for the certificate.
 
 ### NGINX installation for Vue frontend
 
