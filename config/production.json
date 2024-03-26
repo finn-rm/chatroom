@@ -14,5 +14,9 @@
   "certs": {
     "fullChain": "/full/path/to/fullchain.pem",
     "privkey": "/full/path/to/privkey.pem"
+  },
+  "proxy": {
+    "proxyEnabled": "false",
+    "proxyAddr": "http://ip:port"
   }
 }

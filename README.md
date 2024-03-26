@@ -92,9 +92,10 @@ Fill out the `config/production.json` file with the values previously discovered
 * **`roomList`** 	- This is a list of room names that are allowed to be entered.
 * **`msgExpireTime`**	- This is the amount of seconds it will take for the message/room history to be wiped.
 * **`fullchain & privkey`** 	- This is the file path for the full chain certificate for your domain and the file path for the private key for the certificate.
+* **`proxyEnabled`** 	- This allows you to enable the use of a proxy server for the Telegram API requests.
+* **`proxyAddr`** 	- This is the address of your internal proxy.
 
 ### NGINX installation for Vue frontend
-
 
 1. Build the Vue3 project into a static bundle by running:
 

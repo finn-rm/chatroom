@@ -11,6 +11,9 @@ const bodyParser = require('body-parser');
 const fullChain = config.get('certs.fullChain');
 const privkey = config.get('certs.privkey');
 
+const proxyEnabled = config.get('proxy.proxyEnabled');
+const proxyAddr = ( proxyEnabled == 'false' ) ? undefined : config.get('proxy.proxyAddr');
+
 const msgExpireTime = parseInt(config.get('helpdesk.msgExpireTime'), 10);
 
 const options = {
@@ -31,7 +34,14 @@ const port = 3005;
 const telegramBotToken = config.get('telegram.botToken');
 const telegramChannelID = config.get('telegram.channelID');
 const helpdeskConfig = config.get('helpdesk');
-const bot = new TelegramBot(telegramBotToken, { polling: true });
+
+const botOptions = { polling: true };
+
+if ( proxyEnabled ) {
+    botOptions.request = { proxy: proxyAddr };
+}
+
+const bot = new TelegramBot(telegramBotToken, botOptions);
 let botPolling = 0;
 
 let rooms = []
