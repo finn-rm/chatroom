@@ -29,10 +29,10 @@
           <p :style="{ 'page-break-before': isNotLastRoom(index, 'qr') ? 'always' : 'auto' }"></p>
         </div>
         <div v-if="wifi">
-          <div class="font-weight-bold text-h2 text-red text-bold" align="center">Need WiFi?</div>
-          <div class="text-h4 pt-10 pb-10" align="center">Scan the QR code below to get connected!</div>
-          <div v-html="qrCodeData"></div>
-          <div class="text-h5 pt-15 text-blue-grey-lighten-3" align="center">SSID: {{ ssid }} | PW: {{ password }}</div>
+          <div class="pt-4 font-weight-bold text-h2 text-red text-bold" align="center">Need WiFi?</div>
+          <div class="text-h4 pt-10 pb-3" align="center">Scan the QR code below to get connected!</div>
+          <div style="width: 650px; margin: 0 auto;" v-html="qrCodeData"></div>
+          <div class="text-h5 pt-8 text-blue-grey-lighten-3" align="center">SSID: {{ ssid }} | PW: {{ password }}</div>
           <p :style="{ 'page-break-before': isNotLastRoom(index, 'wifi') ? 'always' : 'auto' }"></p>
         </div>
       </v-container>
